@@ -1,0 +1,16 @@
+{
+  "name": "saveadoquerytoblob",
+  "version": "1.0.0",
+  "description": "",
+  "main": "config.js",
+  "scripts": {
+    "serve": "node Main.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@azure/storage-blob": "^12.16.0",
+    "axios": "^1.6.1"
+  }
+}

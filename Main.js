@@ -16,30 +16,49 @@ async function task() {
         const organizationProject = organizationProjectList[i];
         // get workItemList
         const workItemList = await getWorkItemList(organizationProject);
-        for (let i = 0; i < workItemList.length; i++) {
-            const workItem = workItemList[i];
-            // Gets all comments for the workitem
-            const commentList = await getCommentList(workItem.id, organizationProject);
-            for (let j = 0; j < commentList.length; j++) {
-                const comment = commentList[j];
-
-                // Summarize the people who are @
-                let mentionedPerson = summarizePeople(comment)
-
-                // if no one is @, skip
-                if (mentionedPerson.length == 0) {
-                    continue
-                }
-
-                // Determine whether to save to Kusto
-                const flag = isSaveKusto(commentList, comment, mentionedPerson)
-
-                // Add data to the json array
-                if (flag) {
-                    addDataToJsonArray(comment, workItem.id, organizationProject, mentionedPerson)
-                }
-            }
+        if(!workItemList)
+        {
+            log("workItemList is null or undefined, skip this organizationProject: " + organizationProject.orgName);
         }
+        else
+        {
+            for (let i = 0; i < workItemList.length; i++) {
+                const workItem = workItemList[i];
+                // Gets all comments for the workitem
+                const commentList = await getCommentList(workItem.id, organizationProject);
+    
+                // Check if commentList is null or undefined
+                if (!commentList) {
+                    log("commentList is null or undefined, skip this workItem: " + workItem.id);
+                }
+                else
+                {
+                    for (let j = 0; j < commentList.length; j++) {
+                        const comment = commentList[j];
+        
+                        // Summarize the people who are @
+                        let mentionedPerson = summarizePeople(comment)
+        
+                        // if no one is @, skip
+                        if (mentionedPerson.length == 0) {
+                            continue
+                        }
+        
+                        // Determine whether to save to Kusto
+                        const flag = isSaveKusto(commentList, comment, mentionedPerson)
+        
+                        // Add data to the json array
+                        if (flag) {
+                            addDataToJsonArray(comment, workItem.id, organizationProject, mentionedPerson)
+                        }
+                    }
+    
+    
+                }               
+            }
+
+        }
+        
     }
 
 }
@@ -70,7 +89,7 @@ function summarizePeople(comment) {
     let mentionedPerson = []
     targetPerson.forEach(person => {
         if (isAfterMidnightYesterday(comment.createdDate) && comment.text.includes(person.displayName)) {
-            log(`${person.displayName}in${comment.createdDate}was mentioned`)
+            log(`${person.displayName}在${comment.createdDate}被@了`)
             mentionedPerson.push(person)
         }
     });

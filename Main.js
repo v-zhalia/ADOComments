@@ -89,7 +89,7 @@ function summarizePeople(comment) {
     let mentionedPerson = []
     targetPerson.forEach(person => {
         if (isAfterMidnightYesterday(comment.createdDate) && comment.text.includes(person.displayName)) {
-            log(`${person.displayName}在${comment.createdDate}被@了`)
+            log(`${person.displayName} on ${comment.createdDate} was mentioned.`)
             mentionedPerson.push(person)
         }
     });
